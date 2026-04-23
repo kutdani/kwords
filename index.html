@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>韓文背單字</title>
+    <style>
+        :root {
+            --bg: #f8f9fa; --card-bg: #ffffff; --text: #3c4043;
+            --primary: #1a73e8; --success: #34a853; --danger: #ea4335;
+            --warning: #fbbc04; --gray: #70757a; --border: #dadce0; --accent: #673ab7;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #121212; --card-bg: #1e1e1e; --text: #e8eaed;
+                --primary: #8ab4f8; --success: #81c995; --danger: #f28b82;
+                --warning: #fdd663; --gray: #9aa0a6; --border: #3c4043; --accent: #b39ddb;
+            }
+        }
+        body { font-family: 'Noto Sans TC', sans-serif; max-width: 600px; margin: 0 auto; padding: 15px; background-color: var(--bg); color: var(--text); transition: 0.3s; line-height: 1.5; }
+        
+        /* 一般卡片 (新增與設定區) */
+        .card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); margin-bottom: 15px; border: 1px solid var(--border); box-sizing: border-box; width: 100%; }
+        h2 { color: var(--primary); text-align: center; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        
+        .input-group { display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
+        .row-group { display: flex; gap: 8px; width: 100%; box-sizing: border-box; }
+        .row-group select { flex: 1.5; min-width: 0; }
+        .row-group input { flex: 1; min-width: 0; }
+
+        input, select, textarea { 
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); 
+            font-size: 16px; outline: none; background: var(--card-bg); color: var(--text); 
+            box-sizing: border-box; -webkit-appearance: none; 
+        }
+        
+        .setup-group { border: 1px solid var(--border); border-radius: 12px; padding: 15px; background: rgba(0,0,0,0.02); margin-top: 10px; box-sizing: border-box; width: 100%; }
+        
+        button { padding: 12px; cursor: pointer; background-color: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; transition: 0.2s; width: 100%; }
+        button:active { transform: scale(0.98); }
+        
+        .multi-select-box { max-height: 150px; overflow-y: auto; margin: 10px 0; padding: 5px; box-sizing: border-box; }
+        .checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 15px; margin-bottom: 8px; cursor: pointer; padding: 5px; border-radius: 6px; }
+        .checkbox-item input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; -webkit-appearance: checkbox; appearance: checkbox; margin: 0; }
+        
+        .quiz-area { display: none; text-align: center; border-top: 2px solid var(--border); padding-top: 15px; }
+        .pos-badge { background: var(--primary); color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 14px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        .word-main { font-size: 32px; margin: 15px 0; font-weight: bold; }
+        
+        /* 單字庫顯示樣式 - 縮小比例 */
+        .list-item { border: 1px solid var(--border); padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; background: var(--card-bg); }
+        .word-top-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+        .kor-title { font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .tag-pos { color: var(--primary); border: 1.5px solid var(--primary); padding: 1px 6px; border-radius: 5px; font-size: 11px; font-weight: bold; }
+        .tag-cat { color: white; background: var(--accent); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: bold; }
+        .word-actions { margin-left: auto; display: flex; gap: 5px; }
+        .btn-edit-small { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); padding: 2px 8px; font-size: 11px; border-radius: 5px; width: auto; font-weight: normal; }
+        .btn-del-small { background: transparent; color: var(--danger); border: 1.5px solid var(--danger); padding: 2px 8px; font-size: 11px; border-radius: 5px; width: auto; font-weight: normal; }
+        .word-meaning-row { font-size: 15px; color: var(--text); margin-bottom: 6px; padding-left: 2px; }
+        .word-note-gray { color: var(--gray); font-size: 13px; }
+        .mastery-container { display: flex; align-items: center; gap: 8px; }
+        .mastery-bar-bg { flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+        .mastery-bar-fg { height: 100%; transition: 0.5s; }
+        .mastery-percent { font-size: 11px; color: var(--gray); min-width: 35px; }
+
+        input[type=range] { width: 100%; height: 10px; border-radius: 5px; background: #ddd; -webkit-appearance: none; margin: 15px 0; box-sizing: border-box; display: block; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+
+        .filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; align-items: center; }
+        .filter-row select { flex: 1; min-width: 140px; padding: 8px; font-size: 13px; }
+        .btn-small { width: auto; padding: 6px 10px; font-size: 12px; }
+        .speaker-quiz { font-size: 50px; cursor: pointer; margin: 10px 0; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2 id="formTitle">韓文背單字</h2>
+        <div class="input-group" id="addForm">
+            <input type="text" id="korInput" placeholder="韓文單字" autocomplete="off" autocorrect="off">
+            <div class="row-group">
+                <select id="posInput">
+                    <option value="名詞 (명사)">名詞 (명사)</option>
+                    <option value="代名詞 (대명사)">代名詞 (대명사)</option>
+                    <option value="數詞 (수사)">數詞 (수사)</option>
+                    <option value="動詞 (동사)">動詞 (동사)</option>
+                    <option value="形容詞 (형용사)">形容詞 (형용사)</option>
+                    <option value="冠形詞 (관형사)">冠形詞 (관형사)</option>
+                    <option value="副詞 (부사)">副詞 (부사)</option>
+                    <option value="感嘆詞 (감탄사)">感嘆詞 (감탄사)</option>
+                    <option value="助詞 (조사)">助詞 (조사)</option>
+                    <option value="片語/習慣用語">片語/習慣用語</option>
+                </select>
+                <input type="text" id="catInput" placeholder="分類">
+            </div>
+            <input type="text" id="chiInput" placeholder="中文翻譯" autocomplete="off">
+            <textarea id="noteInput" placeholder="備註..." rows="1" autocomplete="off"></textarea>
+            <input type="hidden" id="editingId" value="">
+            <button id="saveBtn" onclick="addWord()">儲存單字</button>
+            <button id="cancelEditBtn" onclick="cancelEdit()" style="background-color: var(--gray); display: none; margin-top: 5px;">取消編輯</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div id="quizSetup">
+            <h3>測驗設定</h3>
+            <label style="font-size: 13px; font-weight: bold; color: var(--accent);">1. 測驗模式：</label>
+            <select id="quizModeSelect" style="margin-top: 5px; margin-bottom: 15px;">
+                <option value="chiToKor">中翻韓 (輸入韓文)</option>
+                <option value="korToChi">韓翻中 (輸入中文)</option>
+                <option value="audioOnly">聽音拼字 (聽音拼韓文)</option>
+                <option value="mixed">隨機混合</option>
+            </select>
+            <label style="font-size: 13px; font-weight: bold; color: var(--accent);">2. 題庫範圍與題數設定：</label>
+            <div class="setup-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 12px; font-weight: bold;">選擇測驗範圍：</span>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="toggleAllCheckboxes(true)" class="btn-small" style="background: var(--gray);">全選</button>
+                        <button onclick="toggleAllCheckboxes(false)" class="btn-small" style="background: var(--gray);">清空</button>
+                    </div>
+                </div>
+                <div class="multi-select-box" id="categoryChecklist"></div>
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 15px 0;">
+                <label style="font-size: 12px; font-weight: bold;">設定題數：<b id="qCountVal" style="color:var(--primary); font-size: 18px;">1</b> / <span id="qMaxLimit">0</span></label>
+                <input type="range" id="qCountSlider" min="1" max="1" value="1" oninput="document.getElementById('qCountVal').innerText = this.value">
+            </div>
+            <button onclick="startQuizRound()" style="background-color: var(--success); margin-top: 20px;">開始測驗挑戰</button>
+        </div>
+
+        <div class="quiz-area" id="quizArea">
+            <div id="progressBar" style="font-size:13px; margin-bottom:8px; color: var(--gray);">進度：1 / 10</div>
+            <div id="qPosDisplay" class="pos-badge">詞性</div>
+            <div id="qDirection" style="font-size: 12px; color: var(--accent); font-weight: bold; margin-bottom:5px;"></div>
+            <div id="qDisplayContainer">
+                <div class="word-main" id="qDisplay">題目內容</div>
+                <div class="speaker-quiz" id="qAudioBtn" onclick="playVoice(currentQuizSet[quizIdx].kor)">🔊</div>
+            </div>
+            <button type="button" id="manualVoiceBtn" style="background-color: var(--gray); margin-bottom: 15px;" onclick="playVoice(currentQuizSet[quizIdx].kor)">🔊 播放發音</button>
+            <div id="qNote" style="font-size: 14px; color: var(--gray); margin-bottom: 10px;"></div>
+            <div id="quizInputHost"></div>
+            <div class="feedback" id="feedback"></div>
+            <div style="display: flex; gap: 10px;"><button type="button" id="prevBtn" style="background-color:var(--gray); flex:1; display:none;" onclick="prevQuestion()">⬅ 上一題</button><button type="button" id="submitBtn" onclick="checkAnswer()" style="flex:2;">提交答案</button></div>
+            <button type="button" id="nextBtn" style="background-color: var(--success); width: 100%; display: none; margin-top:10px;" onclick="nextQuestion()">下一題</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>單字庫管理</h3>
+        <div class="filter-row">
+            <select id="filterCat" onchange="render()"><option value="all">全部分類</option></select>
+            <select id="filterPos" onchange="render()">
+                <option value="all">全部詞性</option>
+                <option value="名詞 (명사)">名詞 (명사)</option>
+                <option value="代名詞 (대명사)">代名詞 (대명사)</option>
+                <option value="數詞 (수사)">數詞 (수사)</option>
+                <option value="動詞 (동사)">動詞 (동사)</option>
+                <option value="形容詞 (형용사)">形容詞 (형용사)</option>
+                <option value="冠形詞 (관형사)">冠形詞 (관형사)</option>
+                <option value="副詞 (부사)">副詞 (부사)</option>
+                <option value="感嘆詞 (감탄사)">感嘆詞 (감탄사)</option>
+                <option value="助詞 (조사)">助詞 (조사)</option>
+                <option value="片語/習慣用語">片語/習慣用語</option>
+            </select>
+            <button onclick="deleteCurrentCategory()" class="btn-small" style="background-color: var(--danger);">刪除分類</button>
+        </div>
+        <div id="wordList"></div>
+        <div style="margin-top: 15px; display: flex; gap: 10px;"><button style="flex:1; font-size: 11px; background-color: var(--gray);" onclick="exportData()">備份複製</button><button style="flex:1; font-size: 11px; background-color: var(--danger);" onclick="clearAllData()">清空資料庫</button></div>
+        <div class="import-box" style="background: rgba(251, 188, 4, 0.1); padding: 10px; border-radius: 12px; border: 1px dashed var(--warning); margin-top: 10px;">
+            <textarea id="impBox" placeholder="貼上備份內容..." rows="1" style="width: 100%; font-size: 11px; box-sizing: border-box;"></textarea>
+            <button onclick="importData()" style="width: 100%; padding: 8px; margin-top: 5px; font-size: 12px; background-color: var(--accent); color: white; border: none; width: 100%; border-radius: 8px;">確認匯入</button>
+        </div>
+    </div>
+
+    <script>
+        const DB_KEY = 'kr_v32_final_stable';
+        let words = JSON.parse(localStorage.getItem(DB_KEY)) || [], currentQuizSet = [], quizIdx = 0, correctCount = 0, lastCategory = "";
+
+        function saveAndRefresh() { localStorage.setItem(DB_KEY, JSON.stringify(words)); updateCategoryUI(); render(); }
+        
+        function updateCategoryUI() {
+            const cats = [...new Set(words.map(w => w.cat || "未分類"))];
+            const checklist = document.getElementById('categoryChecklist');
+            let checklistHTML = `<label class="checkbox-item"><input type="checkbox" name="quizCat" value="SPECIAL_WEAKNESS" onchange="updateQuizCountLimit()"> <span style="color:var(--danger); font-weight:bold;">⚠️ 錯題專區 (未滿100%)</span></label>`;
+            checklistHTML += cats.map(c => `<label class="checkbox-item"><input type="checkbox" name="quizCat" value="${c}" checked onchange="updateQuizCountLimit()"><span>${c}</span></label>`).join('');
+            checklist.innerHTML = checklistHTML;
+            const filter = document.getElementById('filterCat'), currentVal = filter.value;
+            filter.innerHTML = '<option value="all">全部分類</option><option value="weakness">⚠️ 錯題</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            filter.value = currentVal;
+            updateQuizCountLimit();
+        }
+
+        function updateQuizCountLimit() {
+            const selectedBoxes = Array.from(document.querySelectorAll('input[name="quizCat"]:checked')).map(cb => cb.value);
+            let pool = [];
+            if (selectedBoxes.includes("SPECIAL_WEAKNESS")) { pool = words.filter(w => (w.weight || 1) > 1); }
+            const otherCats = selectedBoxes.filter(val => val !== "SPECIAL_WEAKNESS");
+            const catWords = words.filter(w => otherCats.includes(w.cat || "未分類"));
+            let finalPool = Array.from(new Map([...pool, ...catWords].map(item => [item.id, item])).values());
+            const total = finalPool.length;
+            const slider = document.getElementById('qCountSlider');
+            document.getElementById('qMaxLimit').innerText = total;
+            slider.max = Math.max(1, total);
+            if (parseInt(slider.value) > total || slider.value == 0) { slider.value = total; document.getElementById('qCountVal').innerText = total; }
+        }
+
+        function toggleAllCheckboxes(state) { document.querySelectorAll('input[name="quizCat"]').forEach(cb => cb.checked = state); updateQuizCountLimit(); }
+
+        function render() {
+            const catVal = document.getElementById('filterCat').value, posVal = document.getElementById('filterPos').value;
+            const filtered = words.filter(w => {
+                const matchCat = catVal === "all" || (catVal === "weakness" && (w.weight || 1) > 1) || (w.cat || "未分類") === catVal;
+                const matchPos = posVal === "all" || w.pos === posVal;
+                return matchCat && matchPos;
+            });
+            document.getElementById('wordList').innerHTML = filtered.map(w => {
+                const mastery = Math.max(0, 100 - ((w.weight || 1) - 1) * 20);
+                const mColor = mastery < 40 ? "var(--danger)" : (mastery < 80 ? "var(--warning)" : "var(--success)");
+                const noteDisplay = w.note ? ` ｜ <span class="word-note-gray">${w.note}</span>` : "";
+                return `
+                <div class="list-item">
+                    <div class="word-top-row">
+                        <span class="kor-title" onclick="playVoice('${w.kor}')">${w.kor} <span style="font-size:16px;">🔊</span></span>
+                        <span class="tag-pos">${(w.pos || "名詞 (명사)").split(' ')[0]}</span>
+                        <span class="tag-cat">${w.cat || "未分類"}</span>
+                        <div class="word-actions">
+                            <button class="btn-edit-small" onclick="startEdit(${w.id})">編輯</button>
+                            <button class="btn-del-small" onclick="delWord(${w.id})">刪除</button>
+                        </div>
+                    </div>
+                    <div class="word-meaning-row">${w.chi}${noteDisplay}</div>
+                    <div class="mastery-container">
+                        <div class="mastery-bar-bg"><div class="mastery-bar-fg" style="width:${mastery}%; background:${mColor};"></div></div>
+                        <span class="mastery-percent">${Math.round(mastery)}%</span>
+                    </div>
+                </div>`;
+            }).reverse().join('');
+        }
+
+        function addWord() {
+            const kor = document.getElementById('korInput').value.trim(), chi = document.getElementById('chiInput').value.trim(), cat = document.getElementById('catInput').value.trim() || "未分類", eid = document.getElementById('editingId').value;
+            if(!kor || !chi) return alert('資訊不全');
+            const pos = document.getElementById('posInput').value;
+            if(eid) { const i = words.findIndex(w => w.id == eid); words[i] = {...words[i], kor, chi, pos, cat, note: document.getElementById('noteInput').value }; }
+            else { words.push({ kor, chi, pos, cat, note: document.getElementById('noteInput').value, weight: 1, id: Date.now() }); }
+            lastCategory = cat; cancelEdit(); saveAndRefresh();
+        }
+
+        function startEdit(id) {
+            const w = words.find(w => w.id === id); window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('korInput').value = w.kor; document.getElementById('chiInput').value = w.chi;
+            document.getElementById('posInput').value = w.pos; document.getElementById('catInput').value = w.cat || "未分類";
+            document.getElementById('noteInput').value = w.note || ""; document.getElementById('editingId').value = w.id;
+            document.getElementById('formTitle').innerText = "編輯模式"; document.getElementById('saveBtn').innerText = "更新單字"; document.getElementById('cancelEditBtn').style.display = "block";
+        }
+
+        function startQuizRound() {
+            const selectedBoxes = Array.from(document.querySelectorAll('input[name="quizCat"]:checked')).map(cb => cb.value);
+            const mode = document.getElementById('quizModeSelect').value, target = parseInt(document.getElementById('qCountSlider').value);
+            if(selectedBoxes.length === 0) return alert('勾選範圍');
+            let pool = [];
+            if (selectedBoxes.includes("SPECIAL_WEAKNESS")) { pool = words.filter(w => (w.weight || 1) > 1); }
+            const otherCats = selectedBoxes.filter(v => v !== "SPECIAL_WEAKNESS");
+            const catWords = words.filter(w => otherCats.includes(w.cat || "未分類"));
+            let finalPool = Array.from(new Map([...pool, ...catWords].map(item => [item.id, item])).values());
+            if(finalPool.length < 1) return alert('無單字');
+            quizIdx = 0; correctCount = 0; currentQuizSet = [];
+            let temp = [...finalPool], count = Math.min(target, finalPool.length);
+            for(let i=0; i<count; i++){
+                let total = temp.reduce((s, w) => s + (w.weight || 1), 0), rand = Math.random() * total, sum = 0;
+                for(let j=0; j<temp.length; j++){
+                    sum += (temp[j].weight || 1);
+                    if(rand <= sum) {
+                        let obj = {...temp[j]};
+                        obj.currentMode = mode === 'mixed' ? ['korToChi','chiToKor','audioOnly'][Math.floor(Math.random()*3)] : mode;
+                        currentQuizSet.push(obj); temp.splice(j, 1); break;
+                    }
+                }
+            }
+            document.getElementById('quizSetup').style.display = 'none'; document.getElementById('quizArea').style.display = 'block'; showQuestion();
+        }
+
+        function showQuestion() {
+            const q = currentQuizSet[quizIdx], host = document.getElementById('quizInputHost'), rid = Math.random().toString(36).substring(7);
+            const mode = q.currentMode;
+            document.getElementById('qDisplay').style.display = mode === 'audioOnly' ? 'none' : 'block';
+            document.getElementById('qAudioBtn').style.display = mode === 'audioOnly' ? 'block' : 'none';
+            document.getElementById('manualVoiceBtn').style.display = mode === 'audioOnly' ? 'none' : 'block';
+            if (mode === 'korToChi') {
+                document.getElementById('qDirection').innerText = "【看韓文 ➜ 入中文】"; document.getElementById('qDisplay').innerText = q.kor;
+                host.innerHTML = `<input type="text" id="answerInput" name="ans_${rid}" placeholder="填中文" style="text-align:center; font-size:22px;">`;
+            } else if (mode === 'chiToKor') {
+                document.getElementById('qDirection').innerText = "【中 ➜ 韓】"; document.getElementById('qDisplay').innerText = q.chi;
+                host.innerHTML = `<input type="text" id="answerInput" name="ans_${rid}" placeholder="拼韓文" autocomplete="off" autocorrect="off" inputmode="search" style="text-align:center; font-size:22px;">`;
+            } else {
+                document.getElementById('qDirection').innerText = "【聽音拼字】";
+                host.innerHTML = `<input type="text" id="answerInput" name="ans_${rid}" placeholder="拼韓文" autocomplete="off" autocorrect="off" inputmode="search" style="text-align:center; font-size:22px;">`;
+                setTimeout(() => playVoice(q.kor), 500);
+            }
+            document.getElementById('progressBar').innerText = `進度：${quizIdx+1} / ${currentQuizSet.length}`;
+            document.getElementById('qPosDisplay').innerText = q.pos; document.getElementById('qNote').innerText = mode === 'audioOnly' ? "" : (q.note ? `備註：${q.note}` : '');
+            document.getElementById('feedback').innerHTML = ""; 
+            document.getElementById('submitBtn').style.display = 'block'; document.getElementById('nextBtn').style.display = 'none'; 
+            document.getElementById('prevBtn').style.display = quizIdx > 0 ? 'block' : 'none';
+            document.getElementById('answerInput').addEventListener('keypress', e => { if(e.key === 'Enter') checkAnswer(); });
+            setTimeout(() => document.getElementById('answerInput').focus(), 300);
+        }
+
+        function checkAnswer() {
+            const ans = document.getElementById('answerInput').value.trim(), q = currentQuizSet[quizIdx], orig = words.find(w => w.id === q.id);
+            const target = q.currentMode === 'korToChi' ? q.chi : q.kor;
+            if(ans === target) {
+                correctCount++; if(orig && orig.weight > 1) orig.weight -= 0.5;
+                document.getElementById('feedback').innerHTML = `<span style="color:var(--success); font-weight:bold;">正確！ ✓</span>`; setTimeout(nextQuestion, 800);
+            } else {
+                if(orig) orig.weight = (orig.weight || 1) + 2;
+                document.getElementById('feedback').innerHTML = `<span style="color:var(--danger); font-weight:bold;">錯誤！答案：${target}</span>`;
+                document.getElementById('submitBtn').style.display = 'none'; document.getElementById('nextBtn').style.display = 'block';
+            }
+            localStorage.setItem(DB_KEY, JSON.stringify(words));
+        }
+
+        function nextQuestion() { quizIdx++; if(quizIdx < currentQuizSet.length) showQuestion(); else finishQuiz(); }
+        function prevQuestion() { if(quizIdx > 0) { quizIdx--; showQuestion(); } }
+        function finishQuiz() { document.getElementById('quizArea').innerHTML = `<h3>測驗結束</h3><p>得分：${correctCount} / ${currentQuizSet.length}</p><button onclick="location.reload()" style="width:100%;">返回</button>`; }
+        function playVoice(t) { window.speechSynthesis.cancel(); const m = new SpeechSynthesisUtterance(t); m.lang = 'ko-KR'; m.rate = 0.8; window.speechSynthesis.speak(m); }
+        function exportData() {
+            const t = document.createElement("textarea"); t.value = JSON.stringify(words); document.body.appendChild(t);
+            t.select(); document.execCommand("copy"); document.body.removeChild(t); alert("已複製！");
+        }
+        function importData() {
+            try { let d = document.getElementById('impBox').value.trim().replace(/[\n\r]/g, '').replace(/[“”＂]/g, '"'); words = JSON.parse(d); saveAndRefresh(); location.reload(); } catch(e) { alert('失敗'); }
+        }
+        function clearAllData() { if(confirm('清空資料庫？')){ localStorage.removeItem(DB_KEY); location.reload(); } }
+        function delWord(id) { if(confirm('刪除單字？')) { words = words.filter(w => w.id !== id); saveAndRefresh(); } }
+        function deleteCurrentCategory() {
+            const cat = document.getElementById('filterCat').value;
+            if(cat === "all" || cat === "weakness") return alert('請選特定分類');
+            if(confirm(`刪除「${cat}」？`)) { words = words.filter(w => (w.cat || "未分類") !== cat); saveAndRefresh(); }
+        }
+        function cancelEdit() { 
+            document.getElementById('korInput').value = ''; document.getElementById('chiInput').value = '';
+            document.getElementById('noteInput').value = ''; document.getElementById('editingId').value = '';
+            document.getElementById('catInput').value = lastCategory; document.getElementById('formTitle').innerText = "韓文背單字";
+            document.getElementById('saveBtn').innerText = "儲存單字"; document.getElementById('cancelEditBtn').style.display = "none";
+        }
+        updateCategoryUI(); render();
+    </script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
