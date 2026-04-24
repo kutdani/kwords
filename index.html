@@ -14,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>韓文背單字</title>
+    <title>韓文背單字 - 最終比例修正版</title>
     <style>
         :root {
             --bg: #f8f9fa; --card-bg: #ffffff; --text: #3c4043;
@@ -58,15 +58,16 @@
         .pos-badge { background: var(--primary); color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 14px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
         .word-main { font-size: 32px; margin: 15px 0; font-weight: bold; }
         
-        /* 單字庫顯示樣式 - 縮小比例 */
+        /* --- 單字庫管理專用【微型精緻】樣式 --- */
+        .lib-card { padding: 12px 15px !important; }
         .list-item { border: 1px solid var(--border); padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; background: var(--card-bg); }
         .word-top-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
-        .kor-title { font-size: 20px; font-weight: bold; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-        .tag-pos { color: var(--primary); border: 1.5px solid var(--primary); padding: 1px 6px; border-radius: 5px; font-size: 11px; font-weight: bold; }
+        .kor-title { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 3px; cursor: pointer; }
+        .tag-pos { color: var(--primary); border: 1px solid var(--primary); padding: 1px 6px; border-radius: 5px; font-size: 11px; font-weight: bold; }
         .tag-cat { color: white; background: var(--accent); padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: bold; }
         .word-actions { margin-left: auto; display: flex; gap: 5px; }
-        .btn-edit-small { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); padding: 2px 8px; font-size: 11px; border-radius: 5px; width: auto; font-weight: normal; }
-        .btn-del-small { background: transparent; color: var(--danger); border: 1.5px solid var(--danger); padding: 2px 8px; font-size: 11px; border-radius: 5px; width: auto; font-weight: normal; }
+        .btn-edit-small { background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 2px 8px; font-size: 11px; border-radius: 5px; width: auto; font-weight: normal; }
+        .btn-del-small { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 2px 8px; font-size: 11px; border-radius: 5px; width: auto; font-weight: normal; }
         .word-meaning-row { font-size: 15px; color: var(--text); margin-bottom: 6px; padding-left: 2px; }
         .word-note-gray { color: var(--gray); font-size: 13px; }
         .mastery-container { display: flex; align-items: center; gap: 8px; }
@@ -143,11 +144,14 @@
             <div id="progressBar" style="font-size:13px; margin-bottom:8px; color: var(--gray);">進度：1 / 10</div>
             <div id="qPosDisplay" class="pos-badge">詞性</div>
             <div id="qDirection" style="font-size: 12px; color: var(--accent); font-weight: bold; margin-bottom:5px;"></div>
+            
             <div id="qDisplayContainer">
                 <div class="word-main" id="qDisplay">題目內容</div>
                 <div class="speaker-quiz" id="qAudioBtn" onclick="playVoice(currentQuizSet[quizIdx].kor)">🔊</div>
             </div>
+
             <button type="button" id="manualVoiceBtn" style="background-color: var(--gray); margin-bottom: 15px;" onclick="playVoice(currentQuizSet[quizIdx].kor)">🔊 播放發音</button>
+            
             <div id="qNote" style="font-size: 14px; color: var(--gray); margin-bottom: 10px;"></div>
             <div id="quizInputHost"></div>
             <div class="feedback" id="feedback"></div>
@@ -156,7 +160,7 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card lib-card">
         <h3>單字庫管理</h3>
         <div class="filter-row">
             <select id="filterCat" onchange="render()"><option value="all">全部分類</option></select>
@@ -184,7 +188,7 @@
     </div>
 
     <script>
-        const DB_KEY = 'kr_v32_final_stable';
+        const DB_KEY = 'kr_v34_perfect_mini';
         let words = JSON.parse(localStorage.getItem(DB_KEY)) || [], currentQuizSet = [], quizIdx = 0, correctCount = 0, lastCategory = "";
 
         function saveAndRefresh() { localStorage.setItem(DB_KEY, JSON.stringify(words)); updateCategoryUI(); render(); }
@@ -320,12 +324,14 @@
         function checkAnswer() {
             const ans = document.getElementById('answerInput').value.trim(), q = currentQuizSet[quizIdx], orig = words.find(w => w.id === q.id);
             const target = q.currentMode === 'korToChi' ? q.chi : q.kor;
+            const meaningHint = q.currentMode === 'audioOnly' ? `<br><small style="color:var(--gray);">意思：${q.chi}</small>` : "";
             if(ans === target) {
                 correctCount++; if(orig && orig.weight > 1) orig.weight -= 0.5;
-                document.getElementById('feedback').innerHTML = `<span style="color:var(--success); font-weight:bold;">正確！ ✓</span>`; setTimeout(nextQuestion, 800);
+                document.getElementById('feedback').innerHTML = `<span style="color:var(--success); font-weight:bold;">正確！ ✓</span>${meaningHint}`; 
+                setTimeout(nextQuestion, 1200);
             } else {
                 if(orig) orig.weight = (orig.weight || 1) + 2;
-                document.getElementById('feedback').innerHTML = `<span style="color:var(--danger); font-weight:bold;">錯誤！答案：${target}</span>`;
+                document.getElementById('feedback').innerHTML = `<span style="color:var(--danger); font-weight:bold;">錯誤！答案：${target}</span>${meaningHint}`;
                 document.getElementById('submitBtn').style.display = 'none'; document.getElementById('nextBtn').style.display = 'block';
             }
             localStorage.setItem(DB_KEY, JSON.stringify(words));
@@ -337,7 +343,7 @@
         function playVoice(t) { window.speechSynthesis.cancel(); const m = new SpeechSynthesisUtterance(t); m.lang = 'ko-KR'; m.rate = 0.8; window.speechSynthesis.speak(m); }
         function exportData() {
             const t = document.createElement("textarea"); t.value = JSON.stringify(words); document.body.appendChild(t);
-            t.select(); document.execCommand("copy"); document.body.removeChild(t); alert("已複製！");
+            t.select(); document.execCommand("copy"); document.body.removeChild(t); alert("備份已複製！");
         }
         function importData() {
             try { let d = document.getElementById('impBox').value.trim().replace(/[\n\r]/g, '').replace(/[“”＂]/g, '"'); words = JSON.parse(d); saveAndRefresh(); location.reload(); } catch(e) { alert('失敗'); }
