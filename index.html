@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Untitled</title>
+    <title>HWBDZ</title>
     
 
   </head>
@@ -14,7 +14,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>韓文背單字 - 進度條修正版</title>
+    <title>韓文背單字</title>
     <style>
         :root {
             --bg: #f8f9fa; --card-bg: #ffffff; --text: #3c4043;
@@ -30,7 +30,6 @@
         }
         body { font-family: 'Noto Sans TC', sans-serif; max-width: 600px; margin: 0 auto; padding: 15px; background-color: var(--bg); color: var(--text); transition: 0.3s; line-height: 1.5; }
         
-        /* 一般卡片 */
         .card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); margin-bottom: 15px; border: 1px solid var(--border); box-sizing: border-box; width: 100%; }
         h2 { color: var(--primary); text-align: center; margin-top: 0; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         
@@ -72,7 +71,6 @@
         .word-meaning-row { font-size: 15px; color: var(--text); margin-bottom: 6px; padding-left: 2px; }
         .word-note-gray { color: var(--gray); font-size: 13px; }
         
-        /* 進度條樣式修正 */
         .mastery-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; width: 100%; }
         .mastery-bar-bg { flex: 1; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
         .mastery-bar-fg { height: 100%; transition: 0.5s; }
@@ -86,11 +84,13 @@
         .btn-small { width: auto; padding: 6px 10px; font-size: 12px; }
         .speaker-quiz { font-size: 50px; cursor: pointer; margin: 10px 0; display: block; }
 
-        /* 收合控制 */
-        #wordList { overflow: hidden; transition: max-height 0.4s ease-in-out; }
-        .lib-collapsed #wordList { max-height: 550px; } /* 約 10 個單字的高度 */
-        .lib-expanded #wordList { max-height: 10000px; }
+        /* 收合與滑動 */
+        #wordList { overflow-y: auto; transition: max-height 0.4s ease-in-out; padding-right: 5px; }
+        .lib-collapsed #wordList { max-height: 500px; border: 1px inset var(--border); padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.01); }
+        .lib-expanded #wordList { max-height: none; }
         .collapse-btn { background: var(--gray); color: white; width: auto; padding: 5px 12px; font-size: 12px; float: right; margin-top: -35px; border-radius: 6px; }
+        #wordList::-webkit-scrollbar { width: 6px; }
+        #wordList::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     </style>
 </head>
 <body class="lib-collapsed">
@@ -168,11 +168,21 @@
 
     <div class="card lib-card">
         <h3>單字庫管理</h3>
-        <button onclick="toggleLibrary()" id="toggleBtn" class="collapse-btn">顯示全部</button>
+        <button onclick="toggleLibrary()" id="toggleBtn" class="collapse-btn">展開全部</button>
         <div class="filter-row">
             <select id="filterCat" onchange="render()"><option value="all">全部分類</option></select>
-            <select id="filterPos" onchange="render()"><option value="all">全部詞性</option>
-                <option value="名詞 (명사)">名詞</option><option value="動詞 (동사)">動詞</option><option value="形容詞 (형용사)">形容詞</option>
+            <select id="filterPos" onchange="render()">
+                <option value="all">全部詞性</option>
+                <option value="名詞 (명사)">名詞 (명사)</option>
+                <option value="代名詞 (대명사)">代名詞 (대명사)</option>
+                <option value="數詞 (수사)">數詞 (수사)</option>
+                <option value="動詞 (동사)">動詞 (동사)</option>
+                <option value="形容詞 (형용사)">形容詞 (형용사)</option>
+                <option value="冠形詞 (관형사)">冠形詞 (관형사)</option>
+                <option value="副詞 (부사)">副詞 (부사)</option>
+                <option value="感嘆詞 (감探사)">感嘆詞 (감탄사)</option>
+                <option value="助詞 (조사)">助詞 (조사)</option>
+                <option value="片語/習慣用語">片語/習慣用語</option>
             </select>
             <button onclick="deleteCurrentCategory()" class="btn-small" style="background-color: var(--danger);">刪除分類</button>
         </div>
@@ -185,7 +195,7 @@
     </div>
 
     <script>
-        const DB_KEY = 'kr_v37_fix_progress';
+        const DB_KEY = 'kr_v39_fix_filter';
         let words = JSON.parse(localStorage.getItem(DB_KEY)) || [], currentQuizSet = [], quizIdx = 0, correctCount = 0, lastCategory = "";
 
         function saveAndRefresh() { localStorage.setItem(DB_KEY, JSON.stringify(words)); updateCategoryUI(); render(); }
@@ -222,7 +232,7 @@
             const catVal = document.getElementById('filterCat').value, posVal = document.getElementById('filterPos').value;
             const filtered = words.filter(w => {
                 const matchCat = catVal === "all" || (catVal === "weakness" && (w.weight || 1) > 1) || (w.cat || "未分類") === catVal;
-                const matchPos = posVal === "all" || (w.pos && w.pos.includes(posVal));
+                const matchPos = posVal === "all" || w.pos === posVal;
                 return matchCat && matchPos;
             });
             document.getElementById('wordList').innerHTML = filtered.map(w => {
@@ -256,11 +266,11 @@
             if (body.classList.contains('lib-collapsed')) {
                 body.classList.remove('lib-collapsed');
                 body.classList.add('lib-expanded');
-                btn.innerText = "只看部分";
+                btn.innerText = "收合部分";
             } else {
                 body.classList.remove('lib-expanded');
                 body.classList.add('lib-collapsed');
-                btn.innerText = "顯示全部";
+                btn.innerText = "展開全部";
             }
         }
 
